@@ -36,7 +36,7 @@ query GetCurrentTemplate($uri: String!) {
 				}
 			}
 		}
-		editorBlocks {
+		editorBlocks(flat:true) {
 			clientId
 			parentClientId
 			renderedHtml

@@ -61,7 +61,7 @@ export default function parseQueryResult(
  *
  * @return The body classes.
  */
-function parseBodyClasses(
+export function parseBodyClasses(
 	templateByUri: GetCurrentTemplateQuery[ 'templateByUri' ]
 ): string[] | undefined {
 	const bodyClasses: string[] | undefined = [];
@@ -87,7 +87,7 @@ function parseBodyClasses(
  *
  * @return The enqueued scripts.
  */
-function parseEnqueuedScripts(
+export function parseEnqueuedScripts(
 	templateByUri: GetCurrentTemplateQuery[ 'templateByUri' ],
 	wordpressUrl: string
 ): EnqueuedScriptProps[] | undefined {
@@ -111,7 +111,7 @@ function parseEnqueuedScripts(
  *
  * @return The editor blocks.
  */
-function parseEditorBlocks(
+export function parseEditorBlocks(
 	templateByUri: GetCurrentTemplateQuery[ 'templateByUri' ]
 ): BlockData[] | undefined {
 	const editorBlocks: BlockData[] | undefined = [];
@@ -137,7 +137,7 @@ function parseEditorBlocks(
  *
  * @return The enqueued stylesheets.
  */
-function parseEnqueuedStylesheets(
+export function parseEnqueuedStylesheets(
 	wordpressUrl: string,
 	templateByUri?: GetCurrentTemplateQuery[ 'templateByUri' ]
 ): StyleSheetProps[] | undefined {
@@ -159,7 +159,7 @@ function parseEnqueuedStylesheets(
  *
  * @return The script modules.
  */
-function parseScriptModules(
+export function parseScriptModules(
 	templateByUri: GetCurrentTemplateQuery[ 'templateByUri' ],
 	wordpressUrl: string
 ): ScriptModuleProps[] | undefined {
