@@ -1,6 +1,6 @@
 import { TemplateRenderer, TemplateRendererProps } from '@snapwp/next';
 import { EditorBlocksRenderer } from '@snapwp/blocks';
-import { getQueryClient } from '../get-query-client';
+import { getQueryClient } from '../get-server-query-client';
 import { getConfig, getGraphqlUrl } from '@snapwp/core/config';
 import request, { gql } from 'graphql-request';
 import { GetCurrentTemplateDocument, parseBodyClasses, parseEditorBlocks, parseEnqueuedScripts, parseEnqueuedStylesheets, parseScriptModules } from '@snapwp/query';

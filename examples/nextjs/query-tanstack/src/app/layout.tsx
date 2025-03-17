@@ -1,4 +1,4 @@
-import { getQueryClient } from './get-query-client';
+import { getQueryClient } from './get-server-query-client';
 import type React from 'react';
 import { gql, request } from 'graphql-request';
 import { getGraphqlUrl } from '@snapwp/core/config';
