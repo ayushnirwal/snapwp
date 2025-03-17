@@ -1,0 +1,49 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig",
+
+	"compilerOptions": {
+		// Type checking
+		"strict": true,
+
+		// Modules
+		"module": "esnext",
+		"moduleResolution": "bundler",
+
+		// Emit
+		"noEmit": true,
+
+		// Language and Environment
+		"jsx": "preserve",
+		"lib": [ "dom", "dom.iterable", "esnext" ],
+		"target": "ES2017",
+
+		// Javascript Support
+		"allowJs": true,
+
+		// Editor Support
+		"plugins": [
+			{
+				"name": "next"
+			}
+		],
+
+		// Interop Constraints
+		"esModuleInterop": true,
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+
+		// Projects
+		"incremental": true,
+		"composite": true,
+
+		// Completeness
+		"skipLibCheck": true
+	},
+	"include": [
+		"next-env.d.ts",
+		"**/*.ts",
+		"**/*.tsx",
+		".next/types/**/*.ts"
+	],
+	"exclude": [ "node_modules", "src/__generated" ]
+}
