@@ -34,8 +34,10 @@
 		"react": "^19.0.0"
 	},
 	"devDependencies": {
+		"@graphql-typed-document-node/core": "^3.2.0",
 		"@types/node": "*",
 		"@types/react": "*",
+		"graphql": "^16.10.0",
 		"resolve-tspaths": "*",
 		"tsc-watch": "*",
 		"typescript": "*"

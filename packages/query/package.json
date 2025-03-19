@@ -31,21 +31,24 @@
 		"lint:fix": "eslint . --config ../../.eslintrc.json --fix"
 	},
 	"dependencies": {
-		"@snapwp/core": "*"
+		"@apollo/experimental-nextjs-app-support": "^0.11.11",
+		"@snapwp/core": "*",
+		"@tanstack/react-query": "^5.68.0",
+		"graphql-request": "^7.1.2"
 	},
 	"devDependencies": {
 		"@graphql-codegen/cli": "^5.0.2",
 		"@parcel/watcher": "^2.4.1",
 		"@snapwp/codegen-config": "*",
+		"@snapwp/types": "*",
 		"dotenv": "^16.4.5",
 		"resolve-tspaths": "*",
 		"tsc-watch": "*",
-		"typescript": "*",
-		"@snapwp/types": "*"
+		"typescript": "*"
 	},
 	"peerDependencies": {
-		"react": "^19.0.0",
-		"@apollo/client": "^3.11.4",
-		"graphql": "^16.9.0"
+		"@apollo/client": "^3.13.4",
+		"graphql": "^16.9.0",
+		"react": "^19.0.0"
 	}
 }
