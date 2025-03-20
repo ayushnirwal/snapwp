@@ -15,10 +15,12 @@ export type GetRootMetaDataOptions = Partial< {
 } >;
 
 /**
- * Generates root meta data
+ * Generates root meta data.
+ * This is the main export to be consumed at root level [@todo DELETE THIS LINE]
+ * @param options Configuration object. By default has preimplemented fetcher and parser.
  */
 export type GetRootMetaData = (
-	options?: GetRootMetaDataOptions
+	options: GetRootMetaDataOptions
 ) => Promise< Metadata >;
 
 /**
@@ -53,6 +55,7 @@ export type GetRouteOpenGraphMetadataOptions = Partial< {
 /**
  * Generates Route open graph data
  * @param path Pathname of a route
+ * @param options Configuration object. By default has preimplemented fetcher and parser.
  */
 export type GetRouteOpenGraphMetaData = (
 	path: string,
@@ -98,6 +101,7 @@ export type GetRouteTwitterMetaDataOptions = {
 /**
  * Generates Route open graph data
  * @param path Pathname of a route
+ * @param options Configuration object. By default has preimplemented fetcher and parser.
  */
 export type GetRouteTwitterMetaData = (
 	path: string,
@@ -131,13 +135,15 @@ export type RouteMetadata = Partial<
 >;
 
 export type GetRouteMetaDataOptions = {
-	getRouteOpenGraphMetaData: GetRouteOpenGraphMetaData;
-	getRouteTwitterMetaData: GetRouteTwitterMetaDataOptions;
+	getRouteOpenGraphMetaDataOptions: GetRouteOpenGraphMetadataOptions;
+	getRouteTwitterMetaDataOptions: GetRouteTwitterMetaDataOptions;
 };
 
 /**
  * Generates Route open graph data
+ * This is the main export to be consumed at root level [@todo DELETE THIS LINE]
  * @param path Pathname of a route
+ * @param options Configuration object. By default has preimplemented internals.
  */
 export type GetRouteMetaData = (
 	path: string,
