@@ -1,4 +1,3 @@
-import { headers } from 'next/headers';
 import Script from 'next/script';
 import { QueryEngine } from '@snapwp/query';
 import { TemplateHead } from './template-head';
@@ -8,7 +7,7 @@ import type { BlockData } from '@snapwp/types';
 import type { ReactNode } from 'react';
 
 export type TemplateRendererProps = {
-	getTemplateData?: ( typeof QueryEngine )[ 'getTemplateData' ];
+	slug: string[] | undefined;
 	children: ( editorBlocks: BlockData[] ) => ReactNode;
 };
 
@@ -20,17 +19,17 @@ export type TemplateRendererProps = {
  * @param {TemplateRendererProps['getTemplateData']} props.getTemplateData A async callback to get template styles and content.
  * @param {TemplateRendererProps['children']}        props.children        The block content to render.
  *
+ * @param props.slug
  * @return A complete HTML document structure.
  */
 export async function TemplateRenderer( {
-	getTemplateData = QueryEngine.getTemplateData,
+	slug,
 	children,
 }: TemplateRendererProps ): Promise< ReactNode > {
-	const headerList = await headers(); // headers() returns a Promise from NextJS 19.
-	const pathname = headerList.get( 'x-current-path' );
+	const pathname = slug ? slug.join( '/' ) : '/';
 
 	const { editorBlocks, bodyClasses, stylesheets, scripts, scriptModules } =
-		await getTemplateData( pathname || '/' );
+		await QueryEngine.getTemplateData( pathname || '/' );
 
 	if ( ! editorBlocks?.length ) {
 		throw new Error(
