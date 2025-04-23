@@ -37,10 +37,7 @@ export interface SnapWPEnv {
 	wpSiteUrl: string;
 }
 
-export interface SnapWPConfig<
-	TClient extends unknown = unknown,
-	TClientOptions extends unknown = unknown,
-> {
+export interface SnapWPConfig {
 	/**
 	 * Block definitions for the editor.
 	 */
@@ -52,10 +49,11 @@ export interface SnapWPConfig<
 	/**
 	 * Query Engine
 	 */
-	query: QueryEngineConfig< TClient, TClientOptions >;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Any is required to allow any client
+	query: QueryEngineConfig< any, any >;
 }
 
-interface QueryEngineConfig< TClient = unknown, TClientOptions = unknown > {
+interface QueryEngineConfig< TClient, TClientOptions > {
 	engine: new (
 		options?: TClientOptions
 	) => QueryEngine< TClient, TClientOptions >;

@@ -1,5 +1,5 @@
 import { getConfig } from '@snapwp/core/config';
-import type { fetchQueryArgs, QueryEngine, useQueryArgs } from '@snapwp/types';
+import type { QueryArgs, QueryEngine } from '@snapwp/types';
 
 /**
  * Registry class to manage the registration of query engines.
@@ -8,7 +8,7 @@ class Registry {
 	/**
 	 * Holds the registered query engines.
 	 */
-	private static engine?: QueryEngine;
+	private static engine?: QueryEngine< unknown, unknown >;
 
 	/**
 	 * Registers a query engine.
@@ -41,22 +41,6 @@ class Registry {
 /**
  * Returns a client instance for the query engine.
  *
- * @param {TClientOptions} args - Arguments to be passed to the query engine.
- *
- * @throws {Error} If no query engine is found in the config.
- *
- * @return {TClient} The client instance for the query engine.
- */
-export const getClient = < TClient, TClientOptions >(
-	args: TClientOptions
-): TClient => {
-	const engine = Registry.getEngine< TClient, TClientOptions >();
-	return engine.getClient( args );
-};
-
-/**
- * Returns a client instance for the query engine.
- *
  * @param {TClient} client - The client instance to be used.
  *
  * @throws {Error} If no query engine is found in the config.
@@ -79,11 +63,11 @@ export const useClient = < TClient, TClientOptions >(
  *
  * @return {TClient} The server client instance for the query engine.
  */
-export const getServerClient = < TClient, TClientOptions >(
+export const getClient = < TClient, TClientOptions >(
 	args: TClientOptions
 ): TClient => {
 	const engine = Registry.getEngine< TClient, TClientOptions >();
-	return engine.getServerClient( args );
+	return engine.getClient( args );
 };
 
 /**
@@ -96,8 +80,11 @@ export const getServerClient = < TClient, TClientOptions >(
  *   - options: Client-specific query options (kept unknown to allow flexibility; implementers can define stricter types).
  * @return A promise resolving with the queried data.
  */
-export const fetchQuery = < TData, TQueryOptions >(
-	args: fetchQueryArgs< TData, TQueryOptions >
+export const fetchQuery = <
+	TData,
+	TQueryVars extends { [ key: string ]: unknown },
+>(
+	args: QueryArgs< TData, TQueryVars >
 ): Promise< TData > => {
 	const engine = Registry.getEngine();
 	return engine.fetchQuery( args );
@@ -113,8 +100,11 @@ export const fetchQuery = < TData, TQueryOptions >(
  *   - options: Client-specific query options (kept unknown to allow flexibility; implementers can define stricter types).
  * @return The queried data.
  */
-export const useQuery = < TData, TQueryOptions >(
-	args: useQueryArgs< TData, TQueryOptions >
+export const useQuery = <
+	TData,
+	TQueryVars extends { [ key: string ]: unknown },
+>(
+	args: QueryArgs< TData, TQueryVars >
 ): TData => {
 	const engine = Registry.getEngine();
 	return engine.useQuery( args );

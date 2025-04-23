@@ -15,10 +15,25 @@ import {
 import { Logger } from '@snapwp/core';
 import { getGraphqlUrl } from '@snapwp/core/config';
 import { QueryProvider } from './query-provider';
-import type { fetchQueryArgs, QueryEngine, useQueryArgs } from '@snapwp/types';
+import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
+import type { QueryEngine } from '@snapwp/types';
 
 export type clientType = ApolloClient< NormalizedCacheObject >;
 export type clientOptionsType = ApolloClientOptions< NormalizedCacheObject >;
+
+type ApolloQueryOptions<
+	TData,
+	TQueryVars extends { [ key: string ]: unknown },
+> = QueryOptions< TQueryVars, TData >;
+
+type ApolloQueryArgs<
+	TData,
+	TQueryVars extends { [ key: string ]: unknown },
+> = {
+	name: string;
+	query: TypedDocumentNode< TData, TQueryVars >;
+	options?: ApolloQueryOptions< TData, TQueryVars >;
+};
 
 /**
  * An adapter for Apollo Client that implements the QueryEngine interface.
@@ -28,28 +43,33 @@ export type clientOptionsType = ApolloClientOptions< NormalizedCacheObject >;
 export class ApolloClientEngine
 	implements QueryEngine< clientType, clientOptionsType >
 {
-	private client?: ApolloClient< NormalizedCacheObject >;
-	private readonly clientOptions: ApolloClientOptions< NormalizedCacheObject >;
+	private client: ApolloClient< NormalizedCacheObject >;
 
 	/**
 	 * Creates a new instance of ApolloClientEngine.
 	 * @param { ApolloClientOptions< NormalizedCacheObject > } options Optional ApolloClientOptions to configure the client instance.
 	 */
 	constructor( options?: ApolloClientOptions< NormalizedCacheObject > ) {
-		options =
-			options || ( {} as ApolloClientOptions< NormalizedCacheObject > );
+		const defaultOptions: ApolloClientOptions< NormalizedCacheObject > = {
+			cache: new InMemoryCache(),
+			uri: getGraphqlUrl(),
+		};
+		const mergedOptions = {
+			...defaultOptions,
+			...( ( options as Partial<
+				ApolloClientOptions< NormalizedCacheObject >
+			> ) || {} ),
+		};
 
-		this.clientOptions = options;
+		this.client = new ApolloClient( mergedOptions );
 	}
 
 	/**
-	 * Initializes a new ApolloClient instance with default options and merges them with provided options.
-	 *
-	 * @param { ApolloClientOptions< NormalizedCacheObject > } options Optional ApolloClientOptions to merge with the default configuration.
-	 *
+	 * Returns a new ApolloClient instance using merged default and provided options.
+	 * @param { ApolloClientOptions< NormalizedCacheObject > } options Optional client options to merge with the default configuration.
 	 * @return A new instance of ApolloClient with the merged configuration.
 	 */
-	init(
+	getClient(
 		options?: ApolloClientOptions< NormalizedCacheObject >
 	): ApolloClient< NormalizedCacheObject > {
 		const defaultOptions: ApolloClientOptions< NormalizedCacheObject > = {
@@ -62,29 +82,8 @@ export class ApolloClientEngine
 				ApolloClientOptions< NormalizedCacheObject >
 			> ) || {} ),
 		};
-
-		return new ApolloClient( mergedOptions );
-	}
-
-	/**
-	 * Returns a new ApolloClient instance using merged default and provided options.
-	 * @param { ApolloClientOptions< NormalizedCacheObject > } options Optional client options to merge with the default configuration.
-	 * @return A new instance of ApolloClient with the merged configuration.
-	 */
-	getClient(
-		options?: ApolloClientOptions< NormalizedCacheObject >
-	): ApolloClient< NormalizedCacheObject > {
-		return this.init( options );
-	}
-
-	/**
-	 * Returns the ApolloClient instance used on the server.
-	 *
-	 * @return The ApolloClient instance created during initialization.
-	 */
-	getServerClient(): ApolloClient< NormalizedCacheObject > {
 		if ( ! this.client ) {
-			this.client = this.init( this.clientOptions );
+			this.client = new ApolloClient( mergedOptions );
 		}
 		return this.client;
 	}
@@ -97,13 +96,19 @@ export class ApolloClientEngine
 	 */
 	useClient(
 		client: ApolloClient< NormalizedCacheObject > | undefined
-	): ApolloClient< NormalizedCacheObject > | undefined {
-		return client
-			? // eslint-disable-next-line react-hooks/rules-of-hooks -- This is a hook, so we need to use it in a React component.
-			  ( useApolloClient(
-					client as ApolloClient< object >
-			  ) as ApolloClient< NormalizedCacheObject > )
-			: undefined;
+	): ApolloClient< NormalizedCacheObject > {
+		if ( client ) {
+			this.client = client;
+			// eslint-disable-next-line react-hooks/rules-of-hooks -- This is a hook, so we need to use it in a React component.  if (client){
+			return useApolloClient(
+				this.client
+			) as ApolloClient< NormalizedCacheObject >;
+		}
+
+		// eslint-disable-next-line react-hooks/rules-of-hooks -- This is a hook, so we need to use it in a React component.  if (client){
+		return useApolloClient(
+			this.client
+		) as ApolloClient< NormalizedCacheObject >;
 	}
 
 	/**
@@ -115,17 +120,16 @@ export class ApolloClientEngine
 	 * @return A promise that resolves with the query data of type TData.
 	 * @throws An error if the query fails, with enhanced error logging for ApolloErrors.
 	 */
-	// @ts-expect-error TS2416: stricter generics than interface — safe in this context
 	async fetchQuery<
 		TData,
-		TQueryOptions extends QueryOptions | undefined = QueryOptions,
+		TQueryOptions extends { [ key: string ]: unknown },
 	>( {
 		name,
 		query,
 		options,
-	}: fetchQueryArgs< TData, TQueryOptions > ): Promise< TData > {
+	}: ApolloQueryArgs< TData, TQueryOptions > ): Promise< TData > {
 		try {
-			const queryResult = await this.getServerClient().query< TData >( {
+			const queryResult = await this.getClient().query< TData >( {
 				...( options as QueryOptions ),
 				query,
 			} );
@@ -159,12 +163,10 @@ export class ApolloClientEngine
 	 * @param { TQueryOptions } props.options - Optional query options compatible with Apollo's QueryHookOptions.
 	 * @return The query result data of type TData.
 	 */
-	// @ts-expect-error TS2416: stricter generics than interface — safe in this context
-	useQuery<
-		TData,
-		TQueryOptions extends QueryHookOptions | undefined = QueryHookOptions,
-		// @ts-ignore
-	>( { name, query, options }: useQueryArgs< TData, TQueryOptions > ): TData {
+	useQuery< TData, TQueryOptions extends { [ key: string ]: unknown } >( {
+		query,
+		options,
+	}: ApolloQueryArgs< TData, TQueryOptions > ): TData {
 		// eslint-disable-next-line react-hooks/rules-of-hooks -- This is a hook, so we need to use it in a React component.
 		return useApolloQuery< TData, OperationVariables >(
 			query,
