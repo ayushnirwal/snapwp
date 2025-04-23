@@ -8,17 +8,18 @@ class Registry {
 	/**
 	 * Holds the registered query engines.
 	 */
-	private static engine?: QueryEngine< unknown, unknown >;
+	private static engine?: QueryEngine< unknown >;
 
 	/**
 	 * Registers a query engine.
 	 */
 	private static register(): void {
 		const { query } = getConfig();
-		this.engine = new query.engine();
-		if ( ! this.engine ) {
+		if ( ! query || ! query.engine ) {
 			throw new Error( 'No query engine found in the config.' );
 		}
+		const queryConfigOptions = query.options;
+		this.engine = new query.engine( queryConfigOptions );
 	}
 
 	/**
@@ -26,15 +27,12 @@ class Registry {
 	 *
 	 * @return The registered query engine.
 	 */
-	public static getEngine< TClient, TClientOptions >(): QueryEngine<
-		TClient,
-		TClientOptions
-	> {
+	public static getEngine< TClient >(): QueryEngine< TClient > {
 		if ( ! this.engine ) {
 			this.register();
 		}
 
-		return < QueryEngine< TClient, TClientOptions > >this.engine;
+		return < QueryEngine< TClient > >this.engine;
 	}
 }
 
@@ -47,27 +45,23 @@ class Registry {
  *
  * @return {TClient} The client instance for the query engine.
  */
-export const useClient = < TClient, TClientOptions >(
+export const useClient = < TClient >(
 	client: TClient | undefined
 ): TClient | undefined => {
-	const engine = Registry.getEngine< TClient, TClientOptions >();
+	const engine = Registry.getEngine< TClient >();
 	return engine.useClient( client );
 };
 
 /**
  * Returns a server client instance for the query engine.
  *
- * @param {TClientOptions} args - Arguments to be passed to the query engine.
- *
  * @throws {Error} If no query engine is found in the config.
  *
  * @return {TClient} The server client instance for the query engine.
  */
-export const getClient = < TClient, TClientOptions >(
-	args: TClientOptions
-): TClient => {
-	const engine = Registry.getEngine< TClient, TClientOptions >();
-	return engine.getClient( args );
+export const getClient = < TClient >(): TClient => {
+	const engine = Registry.getEngine< TClient >();
+	return engine.getClient();
 };
 
 /**

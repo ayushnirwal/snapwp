@@ -15,27 +15,23 @@ import type { QueryEngine, QueryOptions } from '@snapwp/types';
 export type clientType = QueryClient;
 export type clientOptionsType = QueryClientConfig;
 
-type TanstackQueryOptions<
-	TData,
-	TQueryVars extends { [ key: string ]: unknown },
-> = Omit< FetchQueryOptions< TData > & QueryOptions< TQueryVars >, 'queryKey' >;
-
 type TanStackQueryArgs<
 	TData,
-	TQueryVars extends { [ key: string ]: unknown },
+	TQueryVars extends Record< string, unknown >,
 > = {
 	name: string;
 	query: TypedDocumentNode< TData, TQueryVars >;
-	options?: TanstackQueryOptions< TData, TQueryVars >;
+	options?: Omit<
+		FetchQueryOptions< TData > & QueryOptions< TQueryVars >,
+		'queryKey'
+	>;
 };
 /**
  * TanStack Query Client Adapter that implements the QueryEngine interface.
  * This adapter allows you to work with TanStack Query in a generic way.
  */
-export class TanStackQueryEngine
-	implements QueryEngine< QueryClient, QueryClientConfig >
-{
-	private client: QueryClient;
+export class TanStackQueryEngine implements QueryEngine< QueryClient > {
+	private readonly client: QueryClient;
 
 	/**
 	 *
@@ -48,13 +44,9 @@ export class TanStackQueryEngine
 	/**
 	 * Returns the TanStack QueryClient instance for server-side usage.
 	 *
-	 * @param { QueryClientConfig } options - Client options.
 	 * @return The QueryClient instance.
 	 */
-	getClient( options?: QueryClientConfig ): QueryClient {
-		if ( ! this.client ) {
-			this.client = new QueryClient( options );
-		}
+	getClient(): QueryClient {
 		return this.client;
 	}
 
@@ -124,7 +116,7 @@ export class TanStackQueryEngine
 			 */
 			queryFn: () =>
 				request< TData >( graphqlUrl, query, options?.variables ),
-			...( options as object ),
+			...options,
 		} as UseQueryOptions< TData, unknown > );
 		return result.data as TData;
 	}

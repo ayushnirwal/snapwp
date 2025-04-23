@@ -8,14 +8,13 @@ import type { ComponentType, PropsWithChildren } from 'react';
  * @template TClient - The type of the GraphQL client instance.
  * @template TClientOptions - The type of options used to initialize the client.
  */
-export interface QueryEngine< TClient, TClientOptions > {
+export interface QueryEngine< TClient > {
 	/**
 	 * Retrieve a query client suitable for server-side usage.
 	 *
-	 * @param options - Optional configuration for the client.
 	 * @return The server-side query client instance.
 	 */
-	getClient( options?: TClientOptions ): TClient;
+	getClient(): TClient;
 
 	/**
 	 * Set or retrieve the client instance on the client side.
@@ -34,7 +33,7 @@ export interface QueryEngine< TClient, TClientOptions > {
 	 *   - options: Client-specific query options (kept unknown to allow flexibility; implementers can define stricter types).
 	 * @return A promise resolving with the queried data.
 	 */
-	fetchQuery< TData, TQueryVars extends { [ key: string ]: unknown } >(
+	fetchQuery< TData, TQueryVars extends Record< string, unknown > >(
 		args: QueryArgs< TData, TQueryVars >
 	): Promise< TData >;
 
@@ -47,7 +46,7 @@ export interface QueryEngine< TClient, TClientOptions > {
 	 *   - options: Client-specific query options (kept unknown to allow flexibility; implementers can define stricter types).
 	 * @return The queried data.
 	 */
-	useQuery< TData, TQueryVars extends { [ key: string ]: unknown } >(
+	useQuery< TData, TQueryVars extends Record< string, unknown > >(
 		args: QueryArgs< TData, TQueryVars >
 	): TData;
 
@@ -57,15 +56,13 @@ export interface QueryEngine< TClient, TClientOptions > {
 	QueryProvider: ComponentType< PropsWithChildren< { client: TClient } > >;
 }
 
-export interface QueryOptions<
-	TQueryVars extends { [ key: string ]: unknown },
-> {
+export interface QueryOptions< TQueryVars extends Record< string, unknown > > {
 	variables?: TQueryVars;
 }
 
 export interface QueryArgs<
 	TData,
-	TQueryVars extends { [ key: string ]: unknown },
+	TQueryVars extends Record< string, unknown >,
 > {
 	name: string;
 	query: TypedDocumentNode< TData, TQueryVars >;

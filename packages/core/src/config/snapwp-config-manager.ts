@@ -54,9 +54,7 @@ export interface SnapWPConfig {
 }
 
 interface QueryEngineConfig< TClient, TClientOptions > {
-	engine: new (
-		options?: TClientOptions
-	) => QueryEngine< TClient, TClientOptions >;
+	engine: new ( options?: TClientOptions ) => QueryEngine< TClient >;
 	options?: TClientOptions;
 }
 
